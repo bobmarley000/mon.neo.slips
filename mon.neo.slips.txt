@@ -1,0 +1,828 @@
+All Slips 11,12,9,7,6,5,4,2,1,10,3,13,18,17,20
+
+
+Slip 11
+Q. 1. Create a footwear_brands collection and corresponding Customers collection. [5] 
+Q. 2. Assume appropriate attribute for each collection and insert at least 10 documents each. [10]
+db.footwear.insert({bname:"sparks",cost:100,product:"sliper"})
+db.footwear.insert({bname:"bata",cost:200,product:"shoes"})
+db.footwear.insert({bname:"nike",cost:300,product:"shoes"})
+db.footwear.insert({bname:"raymond",cost:400,product:"sliper"})
+db.footwear.insert({bname:"bata",cost:200,product:"gumboot"})
+db.customer.insert({cname:"ram",purchase:[{bname: "bata"}]})
+db.customer.insert({cname:"sham",purchase:[{bname: "bata"},{bname:"nike"}]})
+db.customer.insert({cname:"viraj",purchase:[{bname: "sparks"},{ product:"sliper"}]})
+db.customer.insert({cname:"ram",purchase:[{bname: "nike"}]})
+i. Display the names of distinct brands available. [21/2 ]
+db.footwear.distinct("bname")
+ii. List the details of footwear belonging to BATA brand. [21/2 ]
+db.footwear.find({bname:"bata"})
+iii. List the names of customers who brought slippers of Sparx brand [5]
+db.customer.find({purchase:[{bname: "sparks"},{ product:"sliper"}]},{cname:1})
+iv. Name of the most popular customer. [5]
+Ans.db.customer.find().sort({purchase:-1}).limit(1).pretty()
+
+
+
+
+
+
+
+
+
+
+Slip 12
+1.	Model the following as a document database A university contains many affiliated colleges. Each college may have one or more courses like arts, science, engineering, commerce, management, etc. There are professors who are affiliated to one or more colleges 
+College {collage_name,course(arts, science, engineering, commerce, management)}
+Professors{pname,age,{collage}
+[course]}
+
+db. university.insert({uname:"sppu"})
+db.collage.insert({cname:”s m joshi”,course:[“arts”,”commerce”]})
+db.collage.insert({"cname":"fc","course":["science","commerce"]})
+db.collage.insert({"cname":"jspm","course":["science","commerce",” engineering”,” management”,”hotel management”,”faramacy”]})
+db.collage.insert({"cname":"sp","course":["arts","science","commerce"]})
+db.collage.insert({"cname":"d y patil","course":["science","commerce","engineering"]})
+db.collage.insert({"cname":"sp","course":["science","commerce","hotel management","faramacy"]})
+db.professor.insert({pname:”ram”,age:40,collage:[“s m joshi”,”fc”]})
+db.professor.insert({pname:"sham",age:45,collage:{cname:["sp","fc"]}})
+db.professor.insert({pname:"sachin",age:50,collage:{cname:["sp","fc",” d y patil”]}})
+
+
+2. Assume appropriate attributes and collections as per the query requirements. [5] 
+3. Insert at least 10 documents in each collection. [10]
+ 4. Answer the following Queries 
+
+a. Display the list of colleges conducting Arts course. [21/2 ] 3
+ans. db.collage.find({"course":"arts"},{cname:1,_id:0})
+b. List names of professors who are above 40 years. [21/2 ] 
+ans. db.professor.find({"age":{$gt:40}},{pname:1,_id:0})
+c. List the names of colleges who have more than 5 professors affiliated to it. [5] 
+ans. collage (cname,course[],professor{pname,age })
+d. List the names of colleges having more than 2 courses.[5]
+ans. db.collage.find({"course":{$gt:2}},{cname:1,_id:0})
+ db.collage.find({"course":{$size:2}},{cname:1,_id:0})
+
+
+
+Collection College:
+db.College.insert([{ "CID" : 100, "Cname" : "Modern College", "courses" : [ "Engineering", "Commerce","Science" ]},{ "CID" : 102, "Cname" : "Arihant College", "courses" : [ "Arts","Managemnet"]},{"CID" :103, "Cname" :"Mohol College", "courses" : ["Arts","Engineering" ]}])
+
+1)	Display the list of colleges conducting Arts course.
+db.College.find({courses:"Arts"},{_id:0,Cname:1})
+
+2)	Number of courses college wise
+College.aggregate([{$project:{item: 1,numberOfcourses:{$cond:{if:{$isArray:"$courses"},then:{$size:"$courses"},else: "NA"}}}}])
+
+3)	List the names of colleges having more than 2 courses.[5]
+db.College.find({$expr:{$gt:[{$size:{ $ifNull: ["$courses", []] } }, 2] }})
+
+4)	List the names of colleges who have more than 5 professors affiliated to it.
+Professors Collection:
+db.Professor.insert([{ "PID" : 100, "Pname" : "Dipali", "affto" : [ "HV Desai College","Modern college ShivajiNagar","Garware College","Modern College", "Arihant College","Mohol College" ]},{ "PID" : 102, "Pname" : "Datta", "affto" : [ "Arihant College"," Kaveri college","Garware College","Wadiya College","Waghire College"]},{"PID" :103, "Pname" :"Prakash", "affto" : ["Gholap College","Poona College" ]}])
+
+db.Professor.find({$expr: {$gt: [{ $size: { $ifNull:["$affto", []] } }, 5]}}).pretty()
+
+
+
+
+
+
+slip 9
+Model the following Automobile information system as a graph model, and answer the following queries using Cypher. Consider an Automobile industry manufacturing different types of vehicles like Heavy Vehicles, Light Vehicles, etc. A customer can buy one or more types of vehicle. A person can recommend or rate a vehicle type. 1. Identify the labels and relationships, along with their properties, and draw a high level Graph model. [5] 2. Create nodes and relationships, along with their properties, and visualize your actual Graph model. [10] 3. Answer the Queries a. List the characteristics of heavy vehicle types. [21/2 ] b. List the name of customers who bought a light vehicle. [21/2 ] c. List the customers who bought more than one type of vehicle. [5] d. List the most recommended vehicle type. [5]
+
+Create(i:industry{name:”Vaishnavi industries”}) 
+create(vt:VehicleType{name:”Light”}) create(vt:VehicleType{name:”Heavy”})   relationship industry manufacturers vehicle type   
+match(i:industry),(vt:VehicleType) where i.name=”Vaishnavi industries” and vt.name=”Light” create(i)-
+[:manufactures]->(vt)  return I,vt  
+ match(i:industry),(vt:VehicleType) where i.name=”Vaishnavi industries” and vt.name=”Heavy” create(i)[:manufactures]->(vt)  return I,vt   
+ 
+creation of vehicle nodes  
+ create(v:Vehicle(name:’Jupiter’,color:’silver’,wheels:2,mode:’Manual’,Mileage:48))return v; create(v:Vehicle(name:’Pleasure’,color:’blue’,wheels:2,mode:’Auto’,Mileage:40))return v; create(v:Vehicle(name:’Herohonda’,color:’black’,wheels:2,mode:’Auto’,Mileage:65))return v; create(v:Vehicle(name:’Road Roller’,color:’yellow’,wheels:9,engineworkson:’Diesel’,Mileage:20)) return v;  
+Create(v:Vehicle(name:’Crane’,color:’red’,wheels:8,engineworkson:’Diesel’,capacity:’20ton’,Mileage:20)
+)return v; 
+create(v:Vehicle(name:’Dumper’,color:’white’,wheels:10,engineworkson:’Diesel’,capacity:’100ton’,Milea ge:20))return v; 
+create(v:Vehicle(name:’Truck’,color:’black’,wheels:10,engineworkson:’Auto’,Mileage:30))return v;   relationship creation vehicle and vhicle type 
+  match(v:Vehicle),(vt:VehicleType) where v.name=”Jupiter” and vt.name=”Light” create(v)-[:type_of]-
+>(vt) return v,vt; 
+ match(v:Vehicle),(vt:VehicleType) where v.name=”Pleasure” and vt.name=”Light” create(v)-[:type_of]-
+>(vt) return v,vt; 
+ match(v:Vehicle),(vt:VehicleType) where v.name=”Herohonda” and vt.name=”Light” create(v)-
+[:type_of]->(vt) return v,vt; 
+ match(v:Vehicle),(vt:VehicleType) where v.name=”Dumper” and vt.name=”Heavy” create(v)-[:type_of]-
+>(vt) return v,vt; 
+ match(v:Vehicle),(vt:VehicleType) where v.name=”Truck” and vt.name=”Heavy” create(v)-[:type_of]-
+>(vt) return v,vt; 
+ match(v:Vehicle),(vt:VehicleType) where v.name=”Crane” and vt.name=”Heavy” create(v)-[:type_of]-
+>(vt) return v,vt; 
+ match(v:Vehicle),(vt:VehicleType) where v.name=”Road Roller” and vt.name=”Heavy” create(v)[:type_of]->(vt) return v,vt;  
+ create(c:customer{name:”Revti”}) return c create(c:customer{name:”Akash”}) return c create(c:customer{name:”Divya”}) return c create(c:customer{name:”Ekta”}) return c  
+ Match(c:customer),(vt:VehicleType) where c.name=”Revti” and vt.name=”Heavy” create©-[:buy]->(vt) return c,vt; 
+ match(c:customer),(vt:VehicleType) where c.name=”Akash” and vt.name=”Heavy” create©-[:buy]->(vt) return c,vt; match(c:customer),(vt:VehicleType) where c.name=”Ekta” and vt.name=”Light” create©-
+[:buy]->(vt) return c,vt; match(c:customer),(vt:VehicleType) where c.name=”Divya” and vt.name=”Heavy” create©-[:buy]->(vt) return c,vt; match(c:customer),(vt:VehicleType) where c.name=”Revti” and vt.name=”Light” create©-[:buy]->(vt) return c,vt;  
+ create(p:person{name:”Kiran”}) return p create(p:person{name:”Jyoti”}) return p create(p:person{name:”Vijay”}) return p  
+ match(p:person),(vt:VehicleType) where p.name=”Kiran” and vt.name=”Light” create(p)-[:recomand]>(vt) return p,vt; match(p:person),(vt:VehicleType) where p.name=”Jyoti” and vt.name=”Light” create(p)-[:recomand]->(vt) return p,vt; match(p:person),(vt:VehicleType) where p.name=”Vijay” and vt.name=”Heavy” create(p)-[:recomand]->(vt) return p,vt;  
+1)	List the characteristics of heavy vehicle types.  
+ Match(v:Vehicle),(vt:VehicleType) where vt.name=”Heavy” and (v)-[:type_of]->(vt) return vt;  
+     
+2)	List the name of customer who bought a light vehicle.  
+    Match(c:customer),(vt:VehicleType) where vt.name=”Light” and ©-[:buy]->(vt) return c,vt;     
+2.	List the customers who bought more than one type of vehicle. [5]
+Match(c:customer),(vt:VehicleType),(v:Vehicle) where (c)-[:buy]-(v) and (v)-[:type_of]-(vt) return case when count (c.name)>=2 then c.name end as result
+3.	List the most recommended vehicle type. [5]
+MATCH (p:person)-[:recommand]->(v:Vehicle),(v: Vehicle)-[:type_of]->(vt:VehicleType) with vt.name as names, count(vt.name) as count_vt WITH collect({names:names, count_vt:count_vt}) as rows, max(count¹vt) as max UNWIND [row in rows WHERE row.count_vt = max] as row RETURN row.names as names, row.count_vt as count_vt
+
+
+
+
+
+
+
+Slip 7
+Model the following Hospitals information as a graph model, and answer the following queries using Cypher. Consider hospitals in and around Pune. Each hospital may have one or more specializations like Pediatric, Gynaec, Orthopedic, etc. A person can recommend/provide review for a hospital. A doctor can be associated with one or more hospitals.  
+  
+create (h:Hospital {name:"Columbia"}) return h; create (h:Hospital {name:"Jehangir"}) return h; 
+create (h:Hospital {name:"Sahyadri"}) return h;  
+create(s:Specialization{name:"Pediatric"}) return s; create(s:Specialization{name:"Orthopedic"}) return s; 
+create(s:Specialization{name:"Gynaec"}) return s;  
+match(h:Hospital),(s:Specialization) where h.name="Columbia" and s.name="Gynaec" create(h)[:Specialized_in]->(s) return h,s;
+match(h:Hospital),(s:Specialization) where h.name="Sahyadri" and s.name="Orthopedic" create (h)[:Specialized_in]->(s) return h,s;  
+match(h:Hospital),(s:Specialization) where h.name="Jehangir" and s.name="Pediatric" create (h)[:Specialized_in]->(s) return h,s;
+
+create(p:Person {name:"Vishal"}) return p;
+ create(r:Recommend {name:"Service"}) return r;  
+  
+match(h:Hospital),(r:Recommend) where h.name="Columbia" and r.name="Service" create (h)[:Recommend_as]->(r) return h,r;  
+create (d:Doctor {name:"Aarohi"}) return d; 
+create (d:Doctor {name:"Rohit"}) return d; 
+
+match (d:Doctor),(h:Hospital) where d.name="Rohit" and h.name="Columbia" create (d)-[:Associated_with]->(h) return d,h;  
+match(d:Doctor),(h:Hospital) where d.name="Rohit" and h.name="Jehangir" create (d)[:Associated_with]->(h) return d,h;  
+  match (d:Doctor),(h:Hospital) where d.name="Aarohi" and h.name="Columbia" create (d)[:Associated_with]->(h) return d,h;  
+  
+Queries  
+1)List the names of hospitals with paediatric specialization.  
+match (h:Hospital),(r:Specialization) where r.name="Pediatric" and (h)-[:Specialized_in]->(r) return r,h;  
+  
+2)List the Names of doctors who are visiting “Jehangir Hospital 
+match (h:Hospital),(d:Doctor) where h.name="Jehangir" and (d)-[:Associated_with]->(h) return d.name;  
+3. List the most recommended Hospital for Gynaec specialization.  
+match (h:Hospital),(r:Specialization) where r.name="Gynaec" and (h)-[:Specialized_in]->(r) return r,h;  
+d. List the names of people who have given a rating of (>=3) for “Jehangir Hospital”[5]
+match (person)-[v:review]->(Hospital{name:”AundhCHS”}) where v.rate>=3 return person.name
+
+
+
+
+
+
+
+slip 6
+Model the following Hotels information as a graph model, and answer the following queries using Cypher. Consider hotels in Pune. Some hotels provide lodging facility whereas some provide only restaurant facility and some provide both. A person can rate(1-5 stars) a hotel for its facility/facilities. A person can recommend a hotel to his/her friends. A person can provide a review for a hotel after his stay/visit. 1. Identify the labels and relationships, along with their properties, and draw a high level Graph model. [5] 2. Create nodes and relationships, along with their properties, and visualize your actual Graph model. [10] 3. Answer the Queries. a. List the names of hotels in Camp area. [21/2 ] b. List the names of hotels having both lodging and restaurant facility. [21/2 ] c. List the names of hotels with high rating (>=4).[5] d. List the most recommended hotels in Koregaon Park area.
+Hotel 
+create(Hotel1:Hotel{name: ”New Poona Cafe” , address: “Camp”}) create(Hotel1:Hotel{name: ”Modern Cafe” , address: “Camp”}) create(Hotel1:Hotel{name: ”Mauli Hotel” , address: “Deccan”}) create(Hotel1:Hotel{name: ”Satkar Hotel” , address: “Koregoan Park”}) create(Hotel1:Hotel{name: ”Prime Hotel” , address: “Koregoan Park”}) 
+Node Creation: Facility create(Facility{name: ”Lodging”}) create(Facility{name: “Restaurant”}) 
+Node Creation: Person create(:Person{name:”Dipali”}) 
+create(:Person{name: ”Puja”}) 
+create(:Person{name: ”Geeta”}) create(:Person{name:”Meenal”}) 
+create(:Person{name:”Shreya”}) 
+Relationship Creation: Provides 
+Match(h:Hotel),(f.Facility) 
+Where h.name=”New Poona Café” and f.name=”Lodging” create (h)-[:provides]-> return h,f 
+ 
+Match(h:Hotel),(f.Facility) 
+Where h.name=”New Poona Café” and f.name=”Restaurant” create (h)-[:provides]-> return h,f 
+ 
+Match(h:Hotel),(f.Facility) 
+Where h.name=”Modern Cafe” and f.name=”Restaurant” create (h)-[:provides]-> return h,f 
+ 
+Match(h:Hotel),(f.Facility) 
+Where h.name=”Mauli Hotel” and f.name=”Lodging” create (h)-[:provides]-> return h,f 
+ 
+Match(h:Hotel),(f.Facility) 
+Where h.name=”Prime Hotel” and f.name=”Lodging” create (h)-[:provides]-> return h,f 
+Relationship Creation:recommend 
+Match(p:Person),(h:hotel) 
+Where p.name=”Dipali” and h.name=”New Poona Cafe” 
+Create (p) –[:recommend]->(h) return p,h 
+ 
+Match(p:Person),(h:hotel) 
+Where p.name=”Geeta” and h.name=”New Poona Cafe” 
+Create (p) –[:recommend]->(h) return p,h 
+ 
+Match(p:Person),(h:hotel) 
+Where p.name=”Meenal” and h.name=”Mauli Hotel” 
+Create (p) –[:recommend]->(h) return p,h 
+
+ 
+Match(h:Hotel),(f.Facility) 
+Where h.name=”Satkar Hotel” and f.name=”Restaurant” 
+create (h)-[:provides]-> return h,f 
+
+Relationship Creation: Review/Rate 
+Match(p:Person) ,(h:Hotel) 
+Where p.name=”Puja” and h.name=”New Poona Café” create (p) –[:review{rate:4}]->(h) return p,h 
+ 
+Match(p:Person) ,(h:Hotel) 
+Where p.name=”Shreya” and h.name=”Modern Cafe” create (p) –[:review{rate:4}]->(h) return p,h 
+ 
+Match(p:Person) ,(h:Hotel) 
+Where p.name=”Shreya” and h.name=”New Poona Café” create (p) –[:review{rate:5}]->(h) return p,h 
+ 
+Match(p:Person) ,(h:Hotel) 
+Where p.name=”Meenal” and h.name=”Satkar Hotel” create (p) –[:review{rate:5}]->(h) return p,h 
+Queries: 
+Query1: 
+List the names of hotel in camp area. 
+Match (h:Hotel) where h.address=”Camp” 
+Return h.name
+Query 2: 
+List the names of hotels having both lodging and restaurant facility. 
+Match(:Facility{name:”Lodging”})—(n:Hotel)—(:Facility{name:”Restaurant”}) 
+Return n.name 
+Query 3: 
+List the names of hotels with high rating>04. 
+Match(Person)-[v:review]->(Hotel) Where v.rate>4 return DISTINCT Hotel.name
+Query 4: 
+List the most recommended hotels in koregoan park area. 
+Match(p:Person)-[:recommened]->(h:Hotel) 
+Where h.address=”Camp” with h.name as names, 
+Count(h.name) as count_vt) 
+WITH collect({names:names,count_vt:count_vt}) as rows, Max(count_vt)as max 
+UNWIND[row in rows WHERE row.count_vt=max] as row 
+RETURN row.names as names,row.count_vt as count_vt 
+
+
+
+
+
+
+
+Slip 5
+Model the following Clothing Brand information as a graph model, and answer the following queries using Cypher. Consider a Mall for clothing. This mall will include different sections for males, females and kids. Each section contains different types of apparels from different brands. There are many apparels with different designs , of each type. An apparel may be available in one or more standard sizes (S/M/L/XL/XXL) 1. Identify the labels and relationships, along with their properties, and draw a high level Graph model. [5] 2. Create nodes and relationships, along with their properties, and visualize your actual Graph model. [10] 3. Answer the queries a. List the different apparels type in female section. [21/2 ] b. List the names of sales staff in “Kids “ section. [21/2 ] c. List the information about black coloured trousers in male section. [5] d. List the brand having least number of apparels under it.
+
+create(s:Section{name:”Males”}) return s 
+create(s:Section{name:”Females”}) return s 
+create(s:Section{name:”Kids”}) return s  
+ create(a:Apparels{name:”Shirt”}) return a 
+create(a:Apparels{name:”T-Shirt”}) return a 
+create(a:Apparels{name:”Kurta”}) return a 
+create(a:Apparels{name:”jacket”}) return a 
+create(a:Apparels{name:”Pant”}) return a 
+create(a:Apparels{name:”Frock”}) return a  
+ create(ss:Salesstaff{name:”Neha”}) return ss 
+create(ss:Salesstaff{name:”Tejas”}) return ss 
+create(ss:Salesstaff{name:”Priya”}) return ss   
+create(b:Brand{name:”Adidas”}) return b 
+create(b:Brand{name:”Myntra”}) return b 
+create(b:Brand{name:”Pooma”}) return b  
+create(as:ApparelSize{name:”Small”}) return as 
+create(as:ApparelSize{name:”Medium”}) return as  
+Create(as:ApparelSize{name:”Large”}) return as 
+create(as:ApparelSize{name:”XL”}) return as 
+create(as:ApparelSize{name:”XXL”}) return as  
+ match(s:Section),(a:Apparels) where s.name=”Males” and a.name=”Pant” create(s)-[:Contains]>(a)return s,a 
+match(s:Section),(a:Apparels) where s.name=”Males” and a.name=”jacket” create(s)[:Contains]->(a)return s,a 
+match(s:Section),(a:Apparels) where s.name=”Males” and a.n”me=”Shirt” create(s)-[:Contains]->(a)return s,a 
+match(s:Section),(a:Apparels) where s.name=”Females” and a.name=”T-Shirt” create(s)-[:Contains]->(a)return s,a match(s:Section),(a:Apparels) where s.name=”Females” and a.name=”Kurta” create(s)-[:Contains]->(a)return s,a 
+match(s:Section),(a:Apparels) where s.name=”Kids” and a.name=”Frock” create(s)-[:Contains]-
+>(a)return s,a   
+match(a:Apparels),(as:ApparelSize) where a.name=”Shirt” and as.name=”Medium” create(a)-[:Size]>(as) return a,as 
+match(a:Apparels),(as:ApparelSize) where a.name=”Shirt” and as.name=”Small” create(a)-[:Size]->(as) return a,as 
+match(a:Apparels),(as:ApparelSize) where a.name=”Shirt” and as.name=”XL” create(a)-[:Size]->(as) return a,as 
+match(a:Apparels),(as:ApparelSize) where a.name=”TShirt” and as.name=”Medium” create(a)-[:Size]->(as) return a,as 
+match(a:Apparels),(as:ApparelSize) where a.name=”T-Shirt” and as.name=”Small” create(a)-[:Size]->(as) return a,as 
+match(a:Apparels),(as:ApparelSize) where a.name=”T-Shirt” and as.name=”Large” create(a)-[:Size]->(as) return a,as 
+match(a:Apparels),(as:ApparelSize) where a.name=”T-Shirt” and as.name=”XXL” create(a)-
+[:Size]->(as) return a,as 
+match(a:Apparels),(as:ApparelSize) where a.name=”Kurta” and as.name=”Medium” create(a)-[:Size]->(as) return a,as 
+match(a:Apparels),(as:ApparelSize) where a.name=”Kurta” and as.name=”Small” create(a)-[:Size]->(as) return a,as 
+match(a:Apparels),(as:ApparelSize) where a.name=”Kurta” and as.name=”Large” create(a)-[:Size]->(as) return a,as 
+match(a:Apparels),(as:ApparelSize) where a.name=”jacket” and as.name=”Large” create(a)[:Size]->(as) return a,as 
+match(a:Apparels),(as:ApparelSize) where a.name=”jacket” and as.name=”XL” create(a)-[:Size]->(as) return a,as 
+match(a:Apparels),(as:ApparelSize) where a.name=”jacket” and as.name=”XXL” create(a)-[:Size]->(as) return a,as match(a:Apparels),(as:ApparelSize) where a.name=”Pant” and as.name=”Medium” create(a)-[:Size]->(as) return a,as 
+match(a:Apparels),(as:ApparelSize) where a.name=”Pant” and as.name=”Large” create(a)-[:Size]->(as) return a,as match(a:Apparels),(as:ApparelSize) where a.name=”Pant” and as.name=”XL” create(a)[:Size]->(as) return a,as match(a:Apparels),(as:ApparelSize) where a.name=”Frock” and as.name=”Small” create(a)-[:Size]->(as) return a,as match(a:Apparels),(as:ApparelSize) where a.name=”Frock” and as.name=”Medium” create(a)-[:Size]->(as) return a,as  
+ match(ss:Salesstaff),(s:Section) where ss.name=’Neha’and s.name='Kids' create (ss)-[:assigned]->(s) return ss,s match(ss:Salesstaff),(s:Section) where ss.name=’Priya’and s.name=’Females’ create (ss)-
+[:assigned]->(s) return ss,s  
+match(ss:Salesstaff),(s:Section) where ss.name=’Tejas’and s.name='Males' create (ss)-[:assignrels) where b.name=”Adidas” and a.name="Shirt" create(b)-[:BRAND]->(a) return b,a match(b:Brand),(a:Apparels) where b.name=”Adidas” and a.name=”Pant” create(b)-[:BRAND]->(a) return b,a match(b:Brand),(a:Apparels) where b.name=”Adidas” and a.name="jacket" create(b)-[:BRAND]->(a) return b,a match(b:Brand),(a:Apparels) where b.name=”Pooma” and a.name=”jacket” create(b)[:BRAND]->(a) return b,a match(b:Brand),(a:Apparels) where b.name=”Pooma” and a.name="T-Shirt” create(b)-[:BRAND]->(a) return b,a match(b:Brand),(a:Apparels) where b.name=”Myntra” and a.name="Kurta" create(b)-[:BRAND]->(a) return b,a match(b:Brand),(a:Apparels) where 
+b.name=”Myntra” and a.name=”Frock” create(b)-[:BRAND]->(a) return b,a    
+1)	List the different apparels type in female section. => 
+match(a:Apparels),(s:Section) where 
+s.name=”Females” and (s)-[:Contains]->(a) return 
+2) List the names of sales staff in ‘kids’ section. => 
+match(ss:Salesstaff),(s:Section) where s.name=”Kids” and (ss)-[:assigned]->(s) return ss  
+3)List the brand having least number of apparels under it. 
+=> match(b:Brand),(a:Apparels) where (b)[:BRAND]->(a) return b.name, count(*)=1 as ct 
+4. List the brand having least number of apparels under it
+match (a:Apparel)-[:from]->(b:Brand) with b.name as names, count(b.name) as count_vt WITH collect({names:names, count_vt:count_vt)) as rows, min(count_vt) as min UNWIND [row in rows WHERE row.count_vt = min] as row RETURN row.names as names, row.count_vt as count_vt|
+
+
+
+
+
+
+
+Slip 4
+Model the following Furniture Showroom information as a graph model, and answer the queries using Cypher. Consider a Furniture showroom with different types of furnitures like sofas sets, tea tables, cupboards, beds, dining tables, etc. Showroom is divided into different sections, one section for each furniture type, Each section handled by a sales staff. A sales staff can handle one or more sections. Customer may enquire about furniture. An enquiry may result in a purchase by the customer. 1. Identify the labels and relationships, along with their properties, and draw a high level Graph model. [5] 2. Create nodes and relationships, along with their properties, and visualize your actual Graph model. [10] 3. Answer the queries. a. List the types of furnitures available in the showroom. [21/2 ] b. List the sections handled by Mr. Satish. [21/2 ] c. List the names of customers who have done only enquiry but not made any purchase. [5] d. List the fast moving furniture types.
+   
+create(ss:Section{name:”Sofa”}),(:Section{name:”Bed”}),(:Section{name:”Cupboard”}),(:Section{name:”Table  
+ create(f:Furniture{name:”Sofa Cumbed”}),(:Furniture{name:”L-shaped sofa”}),(:Furniture{name:”Bed with storage”}),(:Furniture{name:”Coffee table”}),(:Furniture{name:”Dining table”}),(:Furniture{name:”Seel cupboard”})   create(s:Staff{name :”Mr.Satish”}),(:Staff{name :”Mr.Venkat”}),(:Staff{name :"Mr.Mane"})   
+create(c:Customer{name :”Ashwini”}),(:Customer{name :”Pooja”}),(:Customer{name 
+:”Ketan”}),(:Customer{name :”Ojswini”}),(:Customer{name :”Suresh”}),(:Customer{name 
+:"Rahul"}),(:Customer{name :"pranav"}) 
+  match (ss:Section),(f:Furniture) where ss.name = “Sofa” and f.name = “L-shaped sofa” create (f)-
+[:belongTo]->(ss 
+ion),(f:Furniture) where ss.name = “Sofa” and f.name = “Sofa Cumbed” create (f)-[:belongTo]->(ss) return f,ss  
+match (ss:Section),(f:Furniture) where ss.name = “Table” and f.name = “Dining table” create (f)-
+[:belongTo]->(ss) return f,ss  
+match (ss:Section),(f:Furniture) where ss.name = “Table” and f.name = “Coffee table” create (f)-
+[:belongTo]->(ss) return f,ss  
+match (ss:Section),(f:Furniture) where ss.name = “Cupboard” and f.name = “Seel cupboard” create (f)-
+[:belongTo]->(ss) return f,ss  
+match (ss:Section),(f:Furniture) where ss.name = “Bed” and f.name = “Bed with storage” create (f)-
+[:belongTo]->(ss) return f,ss   
+match (ss:Section),(s:Staff) where ss.name = “Bed” and s.name = “Mr.Satish” create (ss)-[:handledBy]-
+>(s) return ss,s  
+match (ss:Section),(s:Staff) where ss.name = “Table” and s.name = “Mr.Satish” create (ss)-[:handledBy]-
+>(s) return ss,s  
+match (ss:Section),(s:Staff) where ss.name = “Bed” and s.name = “Mr.Venkat” create (ss)-[:handledBy]>(s) return ss,s  
+Match (ss:Section),(s:Staff) where ss.name = “Cupboard” and s.name = “Mr.Mane” create (ss)-
+[:handledBy]->(s) return ss,s  
+match (ss:Section),(s:Staff) where ss.name = “Sofa” and s.name = “Mr.Venkat” create (ss)-[:handledBy]-
+>(s) return ss,s   
+match (ss:Section),(c:Customer) where ss.name = “Sofa” and c.name = “Pooja” create (ss)-
+[:PurchasedBy]->© return ss,c  
+match (ss:Section),(c:Customer) where ss.name = “Table” and c.name = “Suresh” create (ss)-
+[:PurchasedBy]->© return ss,c  
+match (ss:Section),(c:Customer) where ss.name = “Table” and c.name = “Ashwini” create (ss)-
+[:enquireBy]->© return ss,c  
+match (ss:Section),(c:Customer) where ss.name = “Bed” and c.name = “Rahul” create (ss)-[:enquireBy]-
+>© return ss,c  
+match (ss:Section),(c:Customer) where ss.name = “Cupboard” and c.name = “Ketan” create (ss)-
+[:enquireBy]->© return ss,c  
+match (ss:Section),(c:Customer) where ss.name = “Cupboard” and c.name = “pranav” create (ss)-
+[:enquireBy]->© return ss,c  
+match (ss:Section),(c:Customer) where ss.name = “Cupboard” and c.name = “Ojswini” create (ss)[:PurchasedBy]->© return ss,c   
+A] List the types of furnitures available in the showroom. 
+ => match(ss:Section),(f:Furniture) where (f)-[:belongTo]->(ss) return 
+B]	List the sections handled by Mr. Satish. 
+ => match(ss:Section),(s:Staff) where s.name = “Mr.Satish” and (ss)-[:handledBy]->(s) return ss.name 
+C]	List the names of customers who have done only enquiry but not made any purchase 
+. => match(ss:Section),(c:Customer) where (ss)-[:enquireBy]->© and not(ss)-[:PurchasedBy]->© return DISTINCT c.name  
+D]	List the fast-moving furniture types. 
+ => match(ss:Section),(c:Customer) where ss.name= (ss)-[:PurchasedBy]->© return DISTINCT ss.name  
+
+
+
+
+
+
+
+Slip 2
+Model the following Dairy Brand information as a graph model , and answer the following queries using Cypher. There are various dairy brands like Amul, Go, Britannia, Gokul etc. Their popularity varies across different states in India. The popularity is measured as %, with a high popularity defined as >=90%, Medium Popularity between 50 to 90%, and Low popularity
+create(b:Brand{name:”AMUL”,id:”1”})   
+Create(b:Brand{name:”GOKUL”,id:”2”}) 
+create(b:Brand{name:”BRITANNIA”,id:”3”})   
+create(b:Brand{name:”GO”,id:”4”})  
+create(c:Category{name:”High Fat”}) 
+create(c:Category{name:”Low Fat”}) 
+ create(p:Product{name:”Cheese”}) 
+create(p:Product{name:”Milk”}) 
+create(p:Product{name:”Butter”}) 	
+create(p:Product{name:”Curd”})  
+create(s:State{name:”Maharashtra”}) 
+create(s:State{name:”Gujrat”})   
+ match(b:Brand),(p:Product)where b.name=”GOKUL” and p.name=”Curd” create(b)-[:Produce]->(p) 
+return b,p 
+match(b:Brand),(p:Product)where b.name=”GOKUL” and p.name=”Milk” create(b)[:Produce]->(p) return b,p 
+match(b:Brand),(p:Product)where b.name=”AMUL” and p.name=”Curd” create(b)-[:Produce]->(p) return b,p 
+match(b:Brand),(p:Product)where b.name=”AMUL” and  
+p.name=”Milk” create(b)-[:Produce]->(p) return b,p 
+match(b:Brand),(p:Product)where b.name=”AMUL” 
+and p.name=”Butter” create(b)-[:Produce]->(p) return b,p 
+match(b:Brand),(p:Product)where b.name=”BRITANNIA” and p.name=”Butter” create(b)-[:Produce]->(p) return b,p 
+match(b:Brand),(p:Product)where b.name=”BRITANNIA” and p.name=”Cheese” create(b)[:Produce]>(p) return b,p 
+match(b:Brand),(p:Product)where b.name=”GO” and p.name=”Butter” create(b)[:Produce]->(p) return b,p   
+  
+match(c:Category),(p:Product)where c.name=”Low Fat” and p.name=”Milk” create(p)-[:Category_of]>© return c,p 
+match(c:Category),(p:Product)where c.name=”High Fat” and p.name=” Milk” create(p)- [:Category_of]->© return c,p
+match(c:Category),(p:Product)where c.name=”Medium Fat” and p.name=” Milk” create(p)- [:Category_of]->© return c,p
+
+match(b:Brand),(s:State)where b.name=”GOKUL” and s.name=”Maharashtra” create(b)-
+[a:Popular_in{per:95}]->(s) return b,s
+match(b:Brand),(s:State)where b.name=”AMUL” and s.name=”Gujrat” create(b)[a:Popular_in{per:95}]>(s) return b,s
+
+a. List the names of different brands considered in your graph. [21/2 ]
+ match(b:Brand)return b.name   
+b. List the brands that are highly popular in Maharastra. [21/2 ]
+match(state{name:”Maharashtra”})<-[a:Popular_in]-(Brand) where a.per>90 return Brand.name
+
+c. List the popular cheese brands in Gujarat
+match(state{name:” Gujarat”})<-[a:popular_in]-(b:Brand),(b:Brand)-[:produces]->(Product{name:”Cheese”}) where a.per>95 returns distinct b.name
+
+d. List the brands manufacturing “low” fat content milk
+match(b:Brand).(p:Product),(c:Category) where p.name="Milk" and e="Low Fat" and(b)-[:Produces]->(p) and (p)-[:Category_of]->(c) return b.name
+
+
+
+
+
+
+
+slip1
+Model the following Society relations among people working in “HCL”, as a graph model, and answer the queries using Cypher. A person can be a friend of another person. A person may have siblings (brothers / sisters), A person may be a parent(mother/father) of another person. A person stays either in Pune or Mumbai or Kolhapur. A person may be working on either ‘Finance’ or ‘Inventory’ or ‘Sales’ projects.  
+1.	Identify the labels and relationships, along with their properties, and draw a 
+high-level Graph model. [10]  
+2.	Create nodes and relationships, along with their properties, and visualize your actual Graph model. [5]  
+3.	Answer the following Queries in Cypher:  
+a.	List the names of people who are parents. [2 1/2]  
+b.	List the names of people working on ‘Finance ‘project [2 1/2]  
+c.	List the names of people staying in ‘Pune’ and ‘Mumbai’. [5]  
+d.	List the names of people who are mothers.  
+[5] [Note: You may Assume additional labels and properties depending on the query requirements] create(p:Person{name:"Dipali",age:39}) return p create(p:Person{name:"Pallawi",age:43}) return p create(p:Person{name:"Meenal",age:38}) return p create(p:Person{name:"Prakash",age:40}) return p create(p:Person{name:"Mrunu",age:2}) return p create(p:Person{name:"Rugved",age:4}) return p create(p:Person{name:"Shreya",age:2}) return p  create(p:Person{name:"Omkar",age:4}) return p create(p:Person{name:"Kaustubh",age:45}) return p 
+ 
+A person can be friend of another person 
+match(p:Person),(pp:Person) where p.name="Dipali" and pp.name="Pallawi" create(p)-[:Friend_of]->(pp)return p,pp 
+match(p:Person),(pp:Person) where p.name="Dipali" and pp.name="Meenal" create(p)-[:Friend_of]->(pp)return p,pp 
+match(p:Person),(pp:Person) where p.name="Mrunu" and pp.name="Rugved" create(p)-[:sisterof]->(pp)return p,pp 
+match(p:Person),(pp:Person) where p.name="Omkar" and pp.name="Shreya" create(p)-[:brotherof]->(pp)return p,pp 
+match(p:Person),(pp:Person) where p.name="Meenal" and pp.name="Mrunu" create(p)-[:motherof]->(pp)return p,pp 
+match(p:Person),(pp:Person) where p.name="Meenal" and pp.name="Rugved" create(p)-[:motherof]->(pp)return p,pp 
+ 
+match(p:Person),(pp:Person) where p.name="Kaustubh" and pp.name="Mrunu" create(p)-[:fatherof]->(pp)return p,pp 
+ 
+match(p:Person),(pp:Person) where p.name="Kaustubh" and pp.name="Rugved" create(p)-[:fatherof]->(pp)return p,pp 
+ 
+match(p:Person),(pp:Person) where p.name="Dipali" and pp.name="Shreya" create(p)-[:motherof]->(pp)return p,pp 
+match(p:Person),(pp:Person) where p.name="Prakash" and pp.name="Shreya" create(p)-[:fatherof]->(pp)return p,pp person stays in pune Mumbai or Kolhapur create(c:City{name:"Pune"}) return c create(c:City{name:"Mumbai"}) return c create(c:City{name:"Kolhapur"}) return c 
+match(p:Person),(c:City) where p.name="Prakash" and c.name="Pune" create(p)-[:staysin]->(c)return p,c 
+match(p:Person),(c:City) where p.name="Kaustubh" and c.name="Mumbai" create(p)-[:staysin]->(c)return p,c 
+match(p:Person),(c:City) where p.name="Meenal" and c.name="Mumbai" create(p)-[:staysin]->(c)return p,c 
+match(p:Person),(c:City) where p.name="Dipali" and c.name="Pune" create(p)-
+[:staysin]->(c)return p,c create(pr:Project{name:"Finance"}) return pr create(pr:Project{name:"Inventory"}) return pr create(pr:Project{name:"Sales"}) return pr 
+match(p:Person),(pr:Project) where p.name="Prakash" and pr.name="Finance" create(p)-[:workson]->(pr)return p,pr 
+match(p:Person),(pr:Project) where p.name="Kaustubh" and pr.name="Inventory" create(p)-[:workson]->(pr)return p,pr 
+match(p:Person),(pr:Project) where p.name="Dipali" and pr.name="Sales" create(p)-[:workson]->(pr)return p,pr 
+ 
+ 
+Queries 
+1)	List the names of people who are parents 
+ MATCH (p:Person),(pp:Person) Where   
+(p)-[:fatherof]->(pp) 
+RETURN DISTINCT p.name AS  name1 
+UNION ALL 	 
+ MATCH (p:Person),(pp:Person) Where   
+(p)-[:motherof]->(pp) RETURN DISTINCT  p.name AS name1 
+OR 
+MATCH (p:Person),(pp:Person) Where   
+(p)-[:fatherof]->(pp) or (p)-[:motherof]->(pp) 
+RETURN DISTINCT p.name  
+2)	List the names of people working on ‘Finance ‘project [2 1/2] 
+  match(p:Person),(pr:Project) where pr.name="Finance" and(p)-[:workson]-
+>(pr) return p.name 
+3)	List the names of people staying in ‘Pune’ and ‘Mumbai’. [5] 
+  MATCH (p:Person),(c:City) WHERE c.name IN ['Pune', 'Mumbai'] and (p)-
+[:staysin]->(c) RETURN p.name 
+4)	List the names of people who are mothers. [5] 
+  match(p:Person),(pp:Person)  where  (p)-[:motherof]->(pp) return DISTINCT  p.name 
+5)	Display the names of people living in Mumbai. 
+  match(p:Person),(c:City) where c.name="Mumbai" and (p)-[:staysin]->(c) return p.name 
+6)	Display the nodes having age above 40. 
+  match(p:Person) where p.age>40 return p.name 
+
+
+
+
+
+
+
+
+
+slip 10
+Model the following University information system as a graph model, and answer the following queries using Cypher. University has various departments like Maths, Geology, Chemistry, etc. Each department conducts various courses and a course may be conducted by multiple departments. Every course may have recommendations provided by people. 1. Identify the labels and relationships, along with their properties, and draw a high level Graph model. [5] 2. Create nodes and relationships, along with their properties, and visualize your actual Graph model. [10] 3. Answer the Queries a. List the names of the courses provided by Chemistry Department. [21/2 ] b. List the details of all the departments in the university. [21/2 ] c. List the names of common courses across chemistry and zoology department. [5] d. List the most recommended course in Computer Science Department.
+create(:University {name:'SPPU', location:'Pune'})
+
+Department Creation
+create (:Department {name:'Comp-Sci'})
+create (:Department {name:'Zoology'})
+create (:Department {name:'Maths"})
+create (:Department {name:'Chemistry'})
+
+match(u:University),(d:Department) where u.name='SPPU'and d.name='Zoology' create (u)-[:Has]->(d) return u,d
+match(u:University), (d:Department) where u.name='SPPU'and d.name='Chemistry' create (u)-[:Has]->(d) return u,d 
+match(u:University), (d:Department) where u.name='SPPU' and d.name='Maths' create (u)-[:Has]->(d) return u,d
+match(u:University), (d:Department) where u.name='SPPU'and d.name='Comp-Sci' create (u)-[:Has]->(d) return u,d
+
+create (:Course (name: 'ExtraCredit'}) 
+create (:Course{name:'BBA'))
+create (:Course (name:"Analytical'})
+create (:Course (name:'Fish culture'})
+
+match(c:Course),(d:Department) where d.name='Comp-Sci' and c.name='BBA' create (d)-[:Conducts]->(c) return d.c 
+match(c:Course), (d:Department) where d.name='Maths' and c.name='BBA' create (d)-[:Conducts]->(c) return d.c
+match(c:Course), (d: Department) where d.name="Maths' and c.name='ExtraCredit' create (d)-[:Conducts]->(e) return d.c
+
+match(c:Course),(d:Department) where d.name="Zoology" and c.name="ExtraCredit' create (d)-[:Conducts]->(c) return d.c
+match(c:Course), (d:Department) where d.name='Chemistry' and c.name='ExtraCredit' create (d)-[:Conducts]->(c) return d.c
+
+create (People (name:'Dipali'})
+create (:People (name:'Maharaj'})
+create (:People {name:'Datta'})
+
+MATCH (p:People), (c:Course) WHERE p.name="Datta" AND c.name=" ExtraCredit " CREATE (p)-[:RECOMMANDS ]->(c) RETURN p 
+MATCH(p:People), (c:Course) WHERE p.name-"Maharaj" AND c.name=" ExtraCredit " CREATE (p)- [:RECOMMANDS ]->(c) RETURN p
+MATCH (p:People), (c:Course) WHERE p.name - "Dipali" AND c.name="ExtraCredit" CREATE (p)- [:RECOMMANDS ]->(c) RETURN p 
+MATCH (p:People). (c:Course) WHERE p.name "Dipali" AND c.name="BBA" CREATE (p)- [:RECOMMANDS ]-> (c) RETURN p
+
+1. List the details of all the departments in the university match(u:University).(c:Course),(d:Department) where u.name='SPPU' and (d)-[:Conducts]->(c) and
+(u)-[:Has]->(d)return d.name,c.name
+
+2.List the names of common courses across computer Science and Maths department.
+WITH ['Comp-Sci','Maths'] as names
+MATCH (d:Department) WHERE
+d.name in names WITH collect(d) as s MATCH (c:Course)
+WHERE ALL(d in s WHERE (d)-[:Conducts]->(c))
+RETURN c
+
+3.List the courses run by chemistry department 
+match(c:Course),(d:Department) where d.name='Chemistry' and (d)-[:Conducts]->(c) return d,c,c.name
+
+4.List the most recommended course in Zoology Department.
+
+MATCH (p:People)-[:recommands]->(c:Course),
+(d:Department)-[:Conducts]->(c:Course) where d.name="Zoology" with c.name as names,
+count(c.name) as count_vt WITH collect({names:names, count_vt:count_vt}) as rows, max(count_vt) as max UNWIND [row in rows WHERE row.count_vt max] as row
+RETURN row.names as names, row.count_vt as count_vt
+
+
+
+
+
+
+Slip 3
+Model the following Import Export information as a graph model, and answer the following queries using Cypher. There are countries which import and export products to each other. Products are produced across different states in a country. Production of the products is measured in %. A product can be exported if its production exceeds 60%. A product needs to be imported if its consumption percentage is more than its production percentage in a country. 1. Identify the labels and relationships, along with their properties, and draw a high level Graph model. [5] 2. Create nodes and relationships, along with their properties, and visualize your actual Graph model. [10] 3. Answer the following Queries a. List the countries that export oil. [21/2 ] b. List the products produced in “Maharashtra”.[21/2 ] c. List the countries that produce more than 70% sugarcane. [5] d. List the countries that do not import any product. [5]
+
+create(c: Country {name:"India")) return c
+create(c: Country{name:"UÂE"}) return c
+create(c: Country{name:"US"}) return c
+create(e: Country {name:"Germany"}) return c
+create(c:Country [name:"AAAA")) return c
+
+create(s:State{name:"Maharashtra"}) return s
+create(s:State {name:"Aasam")) return s
+create(s:State{name:"Dubai"}) return s
+create(s:State{name:"Canada"}) return s
+create(s:State{name:"Mexico")) return s
+create(s:State{name:"Berlin"}) return s
+create(s:State {name:"SSSS"}) return s
+
+country has states
+
+match(c:Country),(s:State) where c.name="India" and s.name="Maharashtra" create (c)-[:Has]->(s) return c,s
+match(c:Country),(s:State) where c.name="India" and s.name="Aasam" create (c)-[:Has]->(s) return c,s
+match(c:Country),(s:State) where c.name-"Germany" and s.name="Canada" create (c)-[:Has]->(s) return c,s
+match(c:Country),(s:State) where c.name="US" and s.name="Berlin" create (c)-[:Has]->(s) return c.s
+match(c:Country),(s:State) where c.name="AAAA" and s.name="Nepal" create (c)-[:Has]->(s) return c,s
+
+create(p:Product {name:"Oil")) return p
+create(p:Product {name:"Sugarcane")) return p
+create(p:Product {name:"Ride"}) return p
+create(p:Product {name:"Lentils")) return p
+
+products are produced across states¹
+
+match(p:Product),(s:State) where p.name="Oil" and s.name="Dubai" create(p)-[:produced across (pper:74,cper:50)]->(s) return p.s
+match(p:Product),(s:State) where p.name="Rice" and s.name="Maharashtra" create(p)-[:produced across (pper:80,cper:45)]->(s) return p,s
+match(p:Product), (s:State) where p.name="Lentils" and s.name="Canada"
+create(p)-[produced across (pper:40,eper:80)]->(s) return p.s
+match(p:Product),(s:State) where p.name="Sugarcane" and s.name="Mexico" create(p)-[:produced across (pper:50.cper:50}]->(s) return p,s
+match(p:Product),(s:State) where p.name-"Oil" and s.name="Aasam" create(p)-[:produced across (pper:59,cper:79)]->(s) return p.s
+match(p:Product),(s:State) where p.name="Sugarcane" and s.name-"Berlin" create(p)-[:produced across (pper:72,cper:50]->(s) return p.s
+match(p:Product),(s:State) where p.name="Oil" and s.name="Mexico" create(p)-[-produced across (pper:50,cper:89)]->(s) return p,s
+
+1. List the countries that export oil
+
+MATCH (c:Country)-[:Has]->(s:State),(p:Product)-[r:produced_across]->(s:State) where p.name="Oil" and r.pper 60 return c.name
+
+2. List the products produced in maharashtra
+
+MATCH (p:Product)-[r-produced across]->(s:State) where s.name="Maharashtra" and r.pper>60 return p.name
+
+3. List the countries that produce more than 70% sugarcane
+
+MATCH (c:Country)-[:Has](s:State),(p:Product)-[r:produced_across]->(s:State) where p.name="Sugarcane" and rpper>70 return c.name
+
+4. List the countries that do not import and export any product
+
+MATCH (c:Country)-[:Has]->(s:State),(p:Product)-[r:produced across]->(s:State) where r.pper r.eper return c.name.p.name
+OR
+match(c:Country)-[Has(s:Site).(p:Product)-[produced_across]->(s:State) where upper reper with c name as names, count(p.name) as count_vt WITH collect(names:names, count_vt:count vt;) as rows
+
+
+
+
+
+
+
+slip13
+1. Model the following sales system as a document database. Consider a set of products, customers, orders and invoices. An invoice is generated when an order is processed. 2. Assume appropriate attributes and collections as per the query requirements. [5] 3. Insert at least 10 documents in each collection. [10] 4. Answer the following Queries. a. List all products in the inventory. [21/2 ] b. List the details of orders with a value >10000. [21/2 ] c. List all the orders which has not been processed (invoice not generated). [5] d. List all the orders along with their invoice for “Mr. Arun Kumar”. [5]
+
+
+ db.product.insert({name:"robot",price:12000}) 
+ db.product.insert({name:"toycar",price:2000}) 
+db.product.insert({name:"cricketset",price:9000}) 
+db.product.insert({name:"studymaterial",price:19000}) 
+
+db.order.insert({orderno:3736,custName:"arun kumar" product:{productName:"toycar",price:20000}, order_ date:"12/2/2019",stetus:"processed",Totalbill:2039,invoice:{invoiceNO:67564, bill:2039,date:"17/2/2019"}}) 
+
+db.order.insert({orderno:3737,custName:"arun kumar",
+product:{productName:"robot",price:12000}, order_date:"11/3/2019",stetus:"processed", Totalbill:12800,invoice:{invoiceNO:67574,bill:12039,date:"17/3/2019"}}) 
+
+db.order.insert({orderno:3738,custName:"arun kumar", product:{productName:"cricketset",price:9000},order _date:"15/5/2019", stetus:"inprocess",Totalbill:9050}) 
+
+ db.order.insert({orderno:3739,custName:"mukeshpatil", product:{productName:"studentmaterial",price:19000} , order_date:"15/8/2019",stetus:"inprocess",Totalbill:19080}) 
+
+a.	List all products in the inventory. [21/2 ] 
+ db.product.find().pretty() 
+
+b.	List the details of orders with a value >10000. [21/2 ] 
+db.order.find({Totalbill:{$lt:10000}})
+
+c.	List all the orders along with their invoice for “Mr. Arun Kumar”. [5] 
+db.order.find({stetus:"in process"}) 
+
+d.	List all the orders which has not been processed (invoice not generated). [5]
+db.order.find({custName:"arun kumar",stetus:"processed"})
+
+
+
+
+
+
+
+slip 18
+Model the following Tours information as a document database. A tour will consider the source and destination. Destination may be all around the world. The tours are planned using different tourism industries. The industries provide the complete information before selecting a particular package. Customers select different packages according to their requirements and can rate/review the tourism industry. 2. Assume appropriate attributes and collections as per the query requirements. [5] 3. Insert at least 10 documents in each collection. [10] 4. Answer the following Queries. a. List the details of packages provided by kesari. [21/2 ] b. List the highest rated tourism industry. [21/2 ] c. List all the details of expenses made by John on his first 3 trips. Also display the total expenses. [5] d. List the names of the customers who went on a tour to Shillong. [5]
+
+Db.turisum.insert({name:”veena word”,rate:9,package:[{pname:”shillong”,cost:10000},{pnam 
+e:”gujart”,cost:7000},{pname:”karnataka”,cost:6000}]}) 
+➢ Db.turisum.insert({name:”rohit”,rate:7,package:[{pname:”shil
+long”,cost:10000},{pname:”rujan”,cost:7000}]}) 
+➢ Db.tour.insert({sourc:”john”,destination:”shillong”,toerisumN ame:”veena 
+word”,tourisumrate:8000,expense:20000,year:2018,custome 
+r:[{cname:”mukesh”,city:”pune”},{cname:”abhijeet 
+sangita”,city:”baramati”},{cname:”manisha”,city:”15no”},{can me:”manasi”,city:”latur”}]}) 
+➢ Db.tour.insert({sourc:”john”,destination:”karnataka”,toerisu mName:”veena 
+word”,tourisumrate:80090,expense:20900,year:2017,custom 
+er:[{cname:”mukesh”,city:”pune”},{cname:”abhijeet 
+sangita”,city:”baramati”},{cname:”manisha”,city:”15no”},{can me:”manasi”,city:”latur”}]}) 
+➢ Db.tour.insert({sourc:”john”,destination:”rajasthan”,toerisum 
+Name:”rohit”,tourisumrate:6000,expense:30400,year:2019,c 
+ustomer:[{cname:”mukesh”,city:”pune”},{cname:”abhijeet 
+sangita”,city:”baramati”},{cname:”manisha”,city:”15no”},{can me:”manasi”,city:”latur”}]}) 
+ Db.tour.insert({sourc:”john”,destination:”taj”,toerisumName: 
+“rohit”,tourisumrate:60090,expense:10400,year:2016,custo 
+mer:[{cname:”mukesh”,city:”pune”},{cname:”abhijeet 
+sangita”,city:”baramati”},{cname:”manisha”,city:”15no”},{can me:”manasi”,city:”latur”}]}) 
+4) 
+
+
+a.	List the details of packages provided by kesari. [21/2 ] 
+db.turisum.find({name:”veena word”}).pretty()
+b.	List the highest rated tourism industry. [21/2 ] 
+db.turisum.find({}).sort({“rate”:-1}).limit(1)
+c.	List all the details of expenses made by John on his first 3 trips. Also display the total expenses. [5] 
+db.tour.aggregate([{“$sort”:{“year”:1}},{“$limit”:3},{$group:{_id:null,”count”:{“$sum”: ”$expnse”}}}]) 
+
+d. List the names of the customers who went on a tour to Shillong. [5]
+db.tour.find({destination:”shillong”})
+
+
+
+
+
+
+Slip:17
+1. Model the following Online Mobile Shopping information as a document database. Consider online mobile shopping where the customer can get different models from different brands. Customers can rate the brands and the models individually.
+2. Assume appropriate attributes and collections as per the query requirements
+3. Insert at least 10 documents in each collection. [10]
+
+
+db.mobile.insert([{"mid":100,"brandname":"samsung","model":"j6","Ram":"4GB","Rom":"32GB","price":1600,"rating":4}])
+db.mobile.insert([{"mid":101,"brandname":"Apple","model":"Iphone 13 pro","Ram":"128GB","Rom":"8GB","price":160000,"rating":8}])
+db.mobile.insert([{"mid":102,"brandname":"Oneplus","model":"Oneplus6","Ram":"62GB","Rom":"32GB","price":10000,"rating":5}])
+db.mobile.insert([{"mid":103,"brandname":"vivo","model":"vivo15","Ram":"6GB","Rom":"48GB","price":20000,"rating":3}])
+db.mobile.insert([{"mid":104,"brandname":"oppo","model":"oppo10","Ram":"3GB","Rom":"32GB","price":1600,"rating":4.5}])
+db.mobile.insert([{"mid":105,"brandname":"Nokia","model":"N9","Ram":"7GB","Rom":"34GB","price":40000,"rating":2}])
+db.mobile.insert([{"mid":106,"brandname":"blackberry","model":"B10","Ram":"4GB","Rom":"38GB","price":50000,"rating":5}])
+db.mobile.insert([{"mid":107,"brandname":"Amazon","model":"Amazon6","Ram":"9GB","Rom":"48GB","price":1900,"rating":3.5}])
+db.mobile.insert([{"mid":108,"brandname":"HP","model":"HP9","Ram":"9GB","Rom":"29GB","price":10000,"rating":3}])
+db.mobile.insert([{"mid":109,"brandname":"honor","model":"Bw26","Ram":"6GB","Rom":"64GB","price":24000,"rating":5}])
+   
+
+
+db.purchase.insert([{"cid":200,"cname":"sakshi","add":"pune","purBrand":"samsung","purModel":"j6"}])
+db.purchase.insert([{"cid":201,"cname":"atika","add":"pune","purBrand":"Apple","purModel":"Iphone 13 pro"}])
+db.purchase.insert([{"cid":202,"cname":"sana","add":"sangli","purBrand":"Apple","purModel":"Iphone 13 pro"}])
+db.purchase.insert([{"cid":203,"cname":"jojo","add":"pune","purBrand":"Apple","purModel":"Iphone 13 pro"}])
+db.purchase.insert([{"cid":204,"cname":"nitu","add":"pune","purBrand":"Apple","purModel":"Iphone 13 pro"}])
+db.purchase.insert([{"cid":205,"cname":"kaif","add":"pune","purBrand":"Apple","purModel":"Iphone 13 pro"}])
+db.purchase.insert([{"cid":206,"cname":"fardin","add":"pune","purBrand":"HP9","purModel":"HP9"}])
+db.purchase.insert([{"cid":207,"cname":"hemant","add":"pune","purBrand":"honor","purModel":"Bw26"}])
+db.purchase.insert([{"cid":208,"cname":"sanket","add":"pune","purBrand":"vivo","purModel":"vivo15"}])
+db.purchase.insert([{"cid":209,"cname":"rohit","add":"pune","purBrand":"Oneplus","purModel":"Oneplus6"}])
+
+4. Answer the following Queries:-
+a. List the mobiles having RAM and ROM as 3GB and32GB.
+ Ans:- db.mobile.find({"Ram":"3GB","Rom":"32GB"},{brandname:1,model:1,_id:0})
+
+b. List the customers who bought Samsung J6.
+Ans:-db.purchase.find({purBrand:"samsung",purModel:"j6"},{cname:1,_id:0})
+
+c. List the names of the distinct brands available. Also display the name of the brand with highest rating.
+Ans:- db.mobile.distinct({"brandname"},{"rating":1,_id:0})
+
+db.mobile.find({},{"brandname":1,"rating":1,_id:0}).sort({"rating":- 1})
+
+d. List all the customers in ascending order who bought
+iPhone 7plus. [5]
+Ans:-db.purchase.find({purBrand:"Apple",purModel:"Iphone 13 pro"},{cname:1,purBrand:1,_id:0}).sort({cname:1})
+
+
+
+
+
+
+
+
+Slip: -20
+. Model the following Hospital information system as a document database. Consider hospitals in and around Pune. Each hospital may have one or more specializations like Pediatric, Gynaec, Orthopaedic, etc. A person can recommend/provide review for a hospital. A doctor can be associated with one or more hospitals. 2. Assume appropriate attributes and collections as per the query requirements. [5] 3. Insert at least 10 documents in each collection. [10] 4. Answer the following Queries a. List the names of hospitals with pediatric specialization. [21/2 ] b. List the Names of doctors who are visiting “Jehangir Hospital ” on Mondays. [21/2 ] c. List the most recommended Hospital for Gynaec specialization. [5] d. List the names of people who have given a rating of (>=3) for “Jehangir Hospital”[5]
+Q1.Assume appropriate attributes and collections as per the query requirements.
+
+
+3. Insert at least 10 documents in each collection.
+Hospital:-
+db.hospital.insert([{"hid":100,"hname":"Jehangir hospital","hadd":"pune","specialization":["pediatric","orthopedic"]}])
+db.hospital.insert([{"hid":101,"hname":"city hospital","hadd":"pune","specialization":["orthopedic"]}])
+db.hospital.insert([{"hid":102,"hname":"sathe hospital","hadd":"Alandi","specialization":["gynaec"]}])
+db.hospital.insert([{"hid":103,"hname":"hope hospital","hadd":"pune","specialization":["pediatric","gynaec"]}])
+db.hospital.insert([{"hid":104,"hname":"sana hospital","hadd":"pune","specialization":["pediatric"}])
+db.hospital.insert([{"hid":105,"hname":"sakshi hospital","hadd":"pune","specialization":["orthopedic"]}])
+db.hospital.insert([{"hid":106,"hname":"atika hospital","hadd":"pune","specialization":["pediatric","orthopedic","gynaec"]}])
+db.hospital.insert([{"hid":107,"hname":"KME hospital","hadd":"pune","specialization":["orthopedic"]}])
+db.hospital.insert([{"hid":108,"hname":"Jehangir hospital","hadd":"pune","specialization":["pediatric","orthopedic"]}])
+db.hospital.insert([{"hid":109,"hname":"city hospital","hadd":"pune","specialization":["gynaec"]}])
+
+
+match (p:person).(h:Hospital) where p.name-"Niket" and h.name-"Aundh CHS" create (p)-[recommands]->(h) return ph
+match (p:person).(h:Hospital) where p.name-"Niket" and h.name-"Aundh CHS" create (p)-[review (rate:4}]->(h) return ph
+match (p:person),(h:Hospital) where p.name="Dipali" and h.name="Aundh CHS" create (p)-[review (rate:2)]->(h) return ph
+match (p:person).(h:Hospital) where p.name="Ranjana" and h.name-"Jahangir" create (p)-[:review (rate:53]->(h) return ph
+
+Doctor:-
+db.doctor.insert([{"did":201,"dname":"dr.Saniya","specialist":["pediatric","gynaec"],"visits":{"monday":["Jehangir hospital","city hospital"],"tuesday":["sana hospital"]}}])
+db.doctor.insert([{"did":202,"dname":"dr.rupali","specialist":["gynaec"],"visits":{"wednesday":["city hospital"],"thursday":["atika hospital"]}}])
+db.doctor.insert([{"did":203,"dname":"dr.devyani","specialist":["orthopedic"],"visits":{"saturday":["hope hospital"],"friday":["sakhshi hospital"]}}])
+db.doctor.insert([{"did":204,"dname":"dr.nitu","specialist":["pediatric","gynaec","orthopedic"],"visits":{"monday":["Jehangir hospital"],"tuesday":["Jehangir hospital"]}}])
+db.doctor.insert([{"did":205,"dname":"dr.vaishnavi","specialist":["pediatric"],"visits":{"thursday":["Jehangir hospital","city hospital"],"sunday":["city hospital"]}}])
+db.doctor.insert([{"did":206,"dname":"dr.nikhat","specialist":["orthopedic","gynaec"],"visits":{"monday":["sathe hospital"],"saturday":["sana hospital"]}}])
+db.doctor.insert([{"did":207,"dname":"dr.kavita","specialist":["pediatric",],"visits":{"friday":[" atika hospital"],"thursday":["sakshi hospital"]}}])
+db.doctor.insert([{"did":208,"dname":"dr.Swati","specialist":["gynaec"],"visits":{"saturday":["hope hospital"],"sunday":["city hospital"]}}])
+db.doctor.insert([{"did":209,"dname":"dr.hemant","specialist":["orthopedic","gynaec"],"visits":{"monday":["hope hospital"],"tuesday":["sana hospital"]}}])
+db.doctor.insert([{"did":210,"dname":"dr.sayli","specialist":["pediatric","orthopedic"],"visits":{"monday":["sana hospital","city hospital"],"tuesday":["KME hospital"]}}])
+
+
+Person:-
+db.person.insert([{"pid":301,"pname":"Rajesh", "rating":{"Jehangir hospital":3,"sathe hospital":3.5}}])
+db.person.insert([{"pid":302,"pname":"pallawi", "rating":{"KME hospital":2,"sakshi hospital":1}}])
+db.person.insert([{"pid":303,"pname":"satish", "rating":{"sana hospital":1.5,"atika hospital":3.5}}])
+db.person.insert([{"pid":304,"pname":"jojo", "rating":{"city hospital":1.5,"hope hospital":2}}])
+db.person.insert([{"pid":305,"pname":"datta", "rating":{"sakshi hospital":3,"sathe hospital":3.5}}])
+db.person.insert([{"pid":306,"pname":"kaif", "rating":{"Jehangir hospital":2,"atika hospital":1}}])
+db.person.insert([{"pid":307,"pname":"fardin", "rating":{"KME hospital":4,"Jehangir hospital":1}}])
+db.person.insert([{"pid":308,"pname":"asma", "rating":{"sana hospital":2,"hope hospital":2.5}}])
+db.person.insert([{"pid":309,"pname":"om", "rating":{"city hospital":3.5,"sathe hospital":1.5}}])
+db.person.insert([{"pid":310,"pname":"abdul", "rating":{"Jehangir hospital":2,"sathe hospital":1}}])
+
+
+
+4. Answer the following Queries
+a. List the names of hospitals with pediatric specialization
+            Ans:-db.hospital.find({"specialization":"pediatric"},{"hname":1,_id:0})
+
+b. List the Names of doctors who are visiting “Jehangir
+Hospital ” on Mondays.
+Ans:-db.doctor.find({"visits.monday":"Jehangir hospital"},{"dname":1,_id:0})
+
+
+
+c. List the most recommended Hospital for Gynaec
+specialization.
+Ans:- db.hospital.find({"specialization":"gynaec"},{"hname":1,_id:0})
+
+d. List the names of people who have given a rating of
+(>=3) for “Jehangir Hospital”[5]
+Ans:- db.person.find({"rating.Jehangir hospital":{$gte:3}},{_id:0,pname:1,"rating.Jehangir hospital":1})
+Or
+match (person)-[v:review)(Hospital {name:"Aundh CHS")) where v.rate-3 return person.name
+
+
